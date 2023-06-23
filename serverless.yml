@@ -1,0 +1,81 @@
+service: clients-api
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-north-1
+  environment:
+    DYNAMODB_CLIENTS_TABLE: ${self:service}-clientsTable-${sls:stage, self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Get
+            - dynamodb:PutItem
+            - dynamodb:Scan
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+
+          Resource: 'arn:aws:dynamodb:${aws:region, self:provider.region}:${aws:accountId}:table/${self:service}-clientsTable-${sls:stage}'
+
+functions:
+  create:
+    handler: clients-api/create.create
+    events:
+      - http:
+          path: clients
+          method: post
+          cors: true
+
+  list:
+    handler: clients-api/list.list
+    events:
+      - http:
+          path: clients
+          method: get
+          cors: true
+
+  get:
+    handler: clients-api/get.get
+    events:
+      - http:
+          path: clients/{id}
+          method: get
+          cors: true
+
+  update:
+    handler: clients-api/update.update
+    events:
+      - http:
+          path: clients/{id}
+          method: put
+          cors: true
+
+  delete:
+    handler: clients-api/delete.delete
+    events:
+      - http:
+          path: clients/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    ClientsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:service}-clientsTable-${sls:stage}
