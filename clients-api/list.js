@@ -10,29 +10,27 @@ const params = {
 module.exports.list = (event, context, callback) => {
   const { queryStringParameters } = event;
 
-  let dbMethod = 'scan';
-
   if (queryStringParameters) {
-    for (const key in queryStringParameters) {
-      params.FilterExpression = `#${key} = :${key} and `; // '#name = :name and #surname = :surname',
-      // params.KeyConditionExpression += `#${key} = :${key} and `;
-      params.ExpressionAttributeNames[`#${key}`] = `${key}`;
-      params.ExpressionAttributeValues[`:${key}`] = queryStringParameters[key];
-    }
-    // (params.ExpressionAttributeNames = {
-    //   '#name': 'name',
-    //   '#surname': 'surname',
-    // }),
-    //   (params.ExpressionAttributeValues = {
-    //     ':name': queryStringParameters.name,
-    //     ':surname': queryStringParameters.surname,
-    //   });
+    params.ExpressionAttributeValues = {};
+    params.ExpressionAttributeNames = {};
+    params.FilterExpression = '';
+    const keys = Object.keys(queryStringParameters);
 
-    dbMethod = 'query';
+    keys.forEach((key) => {
+      params.ExpressionAttributeValues[`:${key}`] = queryStringParameters[key];
+    });
+    params.FilterExpression = keys
+      .map((key) => `#${key} = :${key}`)
+      .join(' and ');
+
+    params.ExpressionAttributeNames = keys.reduce((acc, key) => {
+      acc[`#${key}`] = key;
+      return acc;
+    }, params.ExpressionAttributeNames);
   }
 
-  // fetch all clients from the database
-  dynamoDb[dbMethod](params, (error, result) => {
+  // fetch clients from the database
+  dynamoDb.scan(params, (error, result) => {
     // handle potential errors
     if (error) {
       console.error(error);

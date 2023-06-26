@@ -5,7 +5,7 @@
   "author": "deniss2007@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.1402.0",
+    "aws-sdk": "^2.1404.0",
     "uuid": "^2.0.3"
   }
 }
