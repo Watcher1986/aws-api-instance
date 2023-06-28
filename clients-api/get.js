@@ -15,9 +15,7 @@ module.exports.get = (event, context, callback) => {
     },
   };
 
-  // fetch client from the database
   dynamoDb.get(params, (error, result) => {
-    // handle potential errors
     if (error) {
       console.error(error);
       callback(null, {
@@ -27,7 +25,7 @@ module.exports.get = (event, context, callback) => {
       });
       return;
     }
-    // create a response
+
     if (!result.Item) {
       response = {
         statusCode: 404,

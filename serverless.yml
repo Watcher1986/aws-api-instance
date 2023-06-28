@@ -13,7 +13,7 @@ provider:
       statements:
         - Effect: Allow
           Action:
-            - dynamodb:Get
+            - dynamodb:GetItem
             - dynamodb:PutItem
             - dynamodb:Scan
             - dynamodb:UpdateItem

@@ -16,9 +16,11 @@ module.exports.list = (event, context, callback) => {
     params.FilterExpression = '';
     const keys = Object.keys(queryStringParameters);
 
-    keys.forEach((key) => {
-      params.ExpressionAttributeValues[`:${key}`] = queryStringParameters[key];
-    });
+    keys.forEach(
+      (key) =>
+        (params.ExpressionAttributeValues[`:${key}`] =
+          queryStringParameters[key])
+    );
     params.FilterExpression = keys
       .map((key) => `#${key} = :${key}`)
       .join(' and ');
@@ -29,9 +31,7 @@ module.exports.list = (event, context, callback) => {
     }, params.ExpressionAttributeNames);
   }
 
-  // fetch clients from the database
   dynamoDb.scan(params, (error, result) => {
-    // handle potential errors
     if (error) {
       console.error(error);
       callback(null, {
@@ -42,7 +42,6 @@ module.exports.list = (event, context, callback) => {
       return;
     }
 
-    // create a response
     const response = {
       statusCode: 200,
       body: JSON.stringify(result.Items),

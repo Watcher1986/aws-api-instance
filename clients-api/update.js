@@ -39,9 +39,7 @@ module.exports.update = (event, context, callback) => {
     ReturnValues: 'ALL_NEW',
   };
 
-  // update the client in the database
   dynamoDb.update(params, (error, result) => {
-    // handle potential errors
     if (error) {
       console.error(error);
       callback(null, {
@@ -52,7 +50,6 @@ module.exports.update = (event, context, callback) => {
       return;
     }
 
-    // create a response
     const response = {
       statusCode: 200,
       body: JSON.stringify(result.Attributes),
